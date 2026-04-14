@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perfect 1:1 Background Extract</title>
+    
+    <!-- Load the EXACT ORIGINAL website source code -->
+    <script type="module" crossorigin src="./assets/index-x5paQ7pk.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/react-ZVDsBwBb.js">
+    <link rel="modulepreload" crossorigin href="./assets/three-H0uqkCM-.js">
+    <link rel="modulepreload" crossorigin href="./assets/three-stdlib-orAABGcX.js">
+    <link rel="modulepreload" crossorigin href="./assets/fiber-suYchlKZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-4sL86zKL.js">
+    <link rel="modulepreload" crossorigin href="./assets/store-9Foi6fOs.js">
+    <link rel="modulepreload" crossorigin href="./assets/gsap-nk37oyWQ.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-NfxL-M6n.css">
+  </head>
+  <body>
+    <!-- The React App Injection Point -->
+    <div id="root"></div>
+
+    <style>
+      /* STRIP OUT ALL UI - We ONLY want the 1:1 Canvas Scene */
+      #root h1, #root h2, #root h3, #root h4, #root h5, #root h6, #root p, #root span, #root a, #root button, #root img, #root svg, .cursor {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        display: none !important; /* Force layout destruction for UI elements */
+      }
+
+      /* Disable scrolling to make it a perfect background iframe */
+      html, body {
+        overflow: hidden !important;
+        height: 100vh !important;
+        width: 100vw !important;
+        touch-action: none !important;
+        margin: 0;
+        padding: 0;
+        background-color: #000; 
+      }
+
+      /* Guarantee canvas stays in background */
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1 !important;
+      }
+    </style>
+
+    <script>
+      // Lock down interaction so the original JS doesn't trigger page transitions
+      window.addEventListener('wheel', (e) => e.stopImmediatePropagation(), { capture: true, passive: false });
+      window.addEventListener('touchmove', (e) => e.stopImmediatePropagation(), { capture: true, passive: false });
+      window.addEventListener('touchstart', (e) => e.stopImmediatePropagation(), { capture: true, passive: false });
+      window.addEventListener('keydown', (e) => {
+        if(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Space'].includes(e.code)) {
+          e.stopImmediatePropagation();
+        }
+      }, { capture: true, passive: false });
+
+      // Aggressively cull any leftover floating texts 
+      const observer = new MutationObserver(() => {
+        document.querySelectorAll('span, div[class*="text"], div[class*="content"]').forEach(el => {
+          if (el.textContent && (el.textContent.includes('Drag') || el.textContent.includes('Scroll'))) {
+            el.style.display = 'none';
+          }
+        });
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    </script>
+  </body>
+</html>

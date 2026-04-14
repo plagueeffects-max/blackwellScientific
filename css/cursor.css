@@ -1,0 +1,55 @@
+#cell-cursor {
+    position: fixed; top: 0; left: 0; width: 0; height: 0; z-index: 100000;
+    pointer-events: none; opacity: 0; transition: opacity 0.2s ease; will-change: transform; 
+}
+.cell-layer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+.cell-membrane {
+    width: 44px; height: 44px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* Premium Sci-Fi Liquid Rings */
+.cell-membrane::before, 
+.cell-membrane::after, 
+.cell-membrane .ring-inner {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transform-origin: center;
+}
+
+/* Base ring - smooth rotating liquid */
+.cell-membrane::before {
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    animation: premiumSpin 7s linear infinite;
+}
+
+/* Counter-rotating offset ring */
+.cell-membrane::after {
+    border-color: rgba(222, 33, 54, 0.4);
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    animation: premiumSpin 10s linear infinite reverse;
+}
+
+/* Third structural ring inside HTML */
+.ring-inner {
+    border-radius: 50% 50% 40% 60% / 40% 60% 50% 50%;
+    animation: premiumSpin 5.5s linear infinite;
+    opacity: 0.5;
+}
+
+/* The Core Focus Dot */
+.cell-nucleus {
+    width: 4px; height: 4px;
+    background: #ff283c;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(222, 33, 54, 1);
+}
+
+@keyframes premiumSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
