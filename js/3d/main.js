@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { initBackground, updateBackground, resizeBackground } from './background.js?v=17';
+import { initBackground, updateBackground, resizeBackground } from './background.js?v=20';
 import { initForeground, updateForeground, resizeForeground } from './morph.js?v=17';
 
 let isMobile = window.innerWidth <= 550;

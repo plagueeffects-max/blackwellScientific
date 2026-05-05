@@ -9,20 +9,86 @@
     background-size: contain; background-position: center; background-repeat: no-repeat;
     filter: invert(1) opacity(0.2); 
 }
+
+/* Base Position matching current location over India roughly */
 .location-pin {
     position: absolute; top: 51%; left: 68.5%; z-index: 2;
 }
-/* Glowing 3D Base Shadow on the Map Floor */
-.location-pin::before {
-    content: ''; position: absolute; top: 0; left: 0; 
-    transform: translate(-50%, -50%) rotateX(70deg);
-    width: 12px; height: 12px; background: rgba(255, 40, 60, 1); border-radius: 50%;
-    box-shadow: 0 0 15px 5px rgba(255, 40, 60, 0.8), 0 0 30px 10px rgba(255, 40, 60, 0.4);
-    animation: shadowPulse 3s infinite ease-in-out;
+
+.pin-label {
+    position: absolute;
+    bottom: 25px; 
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 15, 15, 0.85);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #eaeaea;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    animation: fadeInDrop 1s forwards 0.8s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.5px;
+    pointer-events: auto;
 }
 
+.pin-line {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 25px;
+    background: linear-gradient(to top, rgba(239, 68, 68, 0.9), rgba(239, 68, 68, 0));
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+    transform-origin: bottom center;
+    animation: growLine 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
-@keyframes shadowPulse {
-    0%, 100% { transform: translate(-50%, -50%) rotateX(70deg) scale(1); opacity: 1; }
-    50% { transform: translate(-50%, -50%) rotateX(70deg) scale(0.6); opacity: 0.5; }
+.pin-dot {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    width: 5px;
+    height: 5px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 8px 2px #ef4444, 0 0 15px 4px rgba(239, 68, 68, 0.3);
+    z-index: 2;
+}
+
+.pin-ring {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 50%) scaleY(0.4);
+    width: 70px;
+    height: 70px;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0) 70%);
+    border-radius: 50%;
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.05);
+    animation: pulseRing 3s infinite ease-in-out;
+}
+
+@keyframes growLine {
+    0% { height: 0; opacity: 0; }
+    100% { height: 25px; opacity: 1; }
+}
+
+@keyframes fadeInDrop {
+    0% { opacity: 0; transform: translate(-50%, -5px); }
+    100% { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes pulseRing {
+    0% { transform: translate(-50%, 50%) scaleY(0.4) scaleX(0.8); opacity: 0.8; }
+    50% { transform: translate(-50%, 50%) scaleY(0.4) scaleX(1.1); opacity: 0.3; }
+    100% { transform: translate(-50%, 50%) scaleY(0.4) scaleX(0.8); opacity: 0.8; }
 }

@@ -27,7 +27,7 @@ body {
 }
 
 @media (min-width: 1025px) {
-    body, a, button, .nav-item, .fab-glass, .btn-primary, .logo, .desktop-nav a { cursor: none !important; }
+    body, a, button, .nav-item, .fab-glass, .btn-primary, .logo, .desktop-nav a, .desktop-logo-wrap, .home-reveal-btn, .desktop-logo { cursor: none !important; }
     .navbar { display: none !important; }
 }
 
@@ -271,6 +271,268 @@ p { color: #ccc; line-height: 1.8; font-size: 1.05rem; position: relative; z-ind
                 transform 2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s;
 }
 
+/* Framer Text Letter Filler Effect */
+.l-fill {
+    display: inline-block;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.7);
+    position: relative;
+    transition: color 0.4s ease, -webkit-text-stroke 0.4s ease, filter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Framer Stroke Path Animation */
+.stroke-text {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    fill: transparent;
+    stroke: rgba(255, 255, 255, 0.7);
+    stroke-width: 1.5px;
+    stroke-dasharray: 8em; /* 8x font size guarantees it covers the longest letter perimeter */
+    stroke-dashoffset: 8em;
+    transition: fill 0.8s ease, filter 0.8s ease, stroke 0.8s ease;
+}
+.cinematic-reveal.in-view .stroke-text {
+    animation: drawStroke 5.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: 0.8s; /* Lowered delay because the invisible stroke gap takes time to traverse */
+}
+@keyframes drawStroke {
+    0% { stroke-dashoffset: 8em; }
+    100% { stroke-dashoffset: 0; }
+}
+
+/* Maintain the Awwwards Hover Interaction */
+.hero-title:hover .stroke-text {
+    fill: rgba(255, 255, 255, 0.95);
+    stroke: rgba(255, 255, 255, 0.95);
+    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.4));
+}
+
+/* Pro Text Typing Effect */
+.hero-subtitle .l-fill {
+    -webkit-text-stroke: 0px;
+    color: #e2e8f0; 
+    opacity: 0; 
+    position: relative;
+    transition: filter 0.4s ease, color 0.4s ease;
+}
+
+/* 1. Type letter permanently */
+.cinematic-reveal.in-view .hero-subtitle .l-fill {
+    animation: popLetter 0s forwards step-end;
+    animation-delay: calc(1.5s + ((var(--delay) - 10) * 0.06s));
+}
+@keyframes popLetter {
+    to { opacity: 1; }
+}
+
+/* 2. Traveling cursor */
+.hero-subtitle .l-fill::after {
+    content: '';
+    position: absolute;
+    right: -4px; 
+    top: 5%;
+    height: 90%;
+    width: 2px;
+    background: #ffffff;
+    opacity: 0; 
+}
+.cinematic-reveal.in-view .hero-subtitle .l-fill::after {
+    animation: tickCursor 0.06s forwards step-end; /* lasts exactly one tick */
+    animation-delay: calc(1.5s + ((var(--delay) - 10) * 0.06s));
+}
+@keyframes tickCursor {
+    0% { opacity: 1; }
+    99% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* 3. Blinking End Cursor on last letter */
+.cinematic-reveal.in-view .hero-subtitle .l-fill[style*="--delay: 28"]::after {
+    animation: blinkEndCursor 1s step-end infinite;
+    animation-delay: calc(1.5s + ((28 - 10) * 0.06s));
+}
+@keyframes blinkEndCursor {
+    0%, 100% { opacity: 1; filter: drop-shadow(0 0 8px rgba(255,255,255,0.8)); }
+    50% { opacity: 0; }
+}
+
+/* Maintain Awwwards Hover */
+.hero-subtitle .l-fill:hover {
+    color: #ffffff;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+}
+
+/* --- PRO LOGO TICKER --- */
+/* --- PRO LOGO TICKER --- */
+.trusted-brands-container {
+    width: 100vw;
+    position: absolute;
+    bottom: 2vh; 
+    left: 0;
+    margin-top: 0;
+    z-index: 10000; /* Bruteforce override above Three.js fgCanvasContainer (9999) */
+    opacity: 0;
+    transform: translateY(30px) translateZ(0);
+    will-change: transform, opacity;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* This ensures it smoothly fades away when scrolling to the 2nd section, rather than snapping out of existence */
+    transition: opacity 1.2s ease-in-out, transform 1.2s ease-in-out;
+}
+
+.cinematic-reveal.in-view ~ .trusted-brands-container,
+.trusted-brands-container.in-view {
+    opacity: 1;
+    transform: translateY(0) translateZ(0);
+    transition: opacity 1.8s ease-out 2.4s, transform 1.8s cubic-bezier(0.19, 1, 0.22, 1) 2.4s;
+}
+
+.ticker-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 30px;
+    gap: 15px;
+}
+
+.ticker-header::before {
+    content: '';
+    height: 1px;
+    width: 80px;
+    background: linear-gradient(270deg, rgba(255,255,255,0.2), transparent);
+}
+
+.ticker-line {
+    height: 1px;
+    width: 80px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.2), transparent);
+}
+
+.ticker-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.45em;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+}
+
+.pro-ticker-viewport {
+    width: 100%;
+    overflow: hidden; 
+    padding: 50px 0; 
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,1) 80%, transparent 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.01) 50%, transparent 100%);
+}
+.pro-ticker-viewport:active { cursor: grabbing; }
+
+.pro-ticker-track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    will-change: transform;
+}
+
+.pro-ticker-track img {
+    height: 52px; 
+    width: auto;
+    max-width: 320px;
+    object-fit: contain; 
+    margin: 0 4.5vw; 
+    /* Critical: Filter chains must literally match length and order for browsers to interpolate! */
+    filter: grayscale(100%) contrast(500%) invert(1) brightness(1.0);
+    opacity: 0.15;
+    mix-blend-mode: screen;
+    transition: filter 1.4s cubic-bezier(0.19, 1, 0.22, 1), transform 1.4s cubic-bezier(0.19, 1, 0.22, 1), opacity 1.4s cubic-bezier(0.19, 1, 0.22, 1);
+    pointer-events: none; 
+    transform-origin: center center;
+}
+
+.pro-ticker-track img.focused {
+    filter: grayscale(100%) contrast(500%) invert(1) brightness(1.7);
+    opacity: 1;
+    transform: scale(1.35); 
+    z-index: 10;
+}
+
+/* Beautiful Minimalist Progress Bar */
+.pro-ticker-progress-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 35px;
+}
+
+.pro-ticker-progress-bar {
+    width: 200px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    position: relative;
+    cursor: pointer;
+}
+
+.pro-ticker-thumb {
+    position: absolute;
+    top: -1.5px;
+    left: 0;
+    width: 24px;
+    height: 4px;
+    background: #ffffff;
+    border-radius: 4px;
+    cursor: grab;
+    transition: background 0.4s ease, box-shadow 0.4s ease;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    will-change: transform;
+}
+
+.pro-ticker-thumb:hover { background: #ff283c; box-shadow: 0 0 15px rgba(255, 40, 60, 0.6); }
+.pro-ticker-thumb:active { cursor: grabbing; background: #ff283c; }
+
+/* Mobile Fixes for Pro Ticker */
+@media (max-width: 768px) {
+    .trusted-brands-container {
+        bottom: 8vh; /* Lift slightly to clear mobile bottom UI bars */
+    }
+    .ticker-header {
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+    .ticker-label {
+        font-size: 0.55rem;
+        letter-spacing: 0.25em;
+    }
+    .ticker-header::before, .ticker-line {
+        width: 40px;
+    }
+    .pro-ticker-viewport {
+        padding: 30px 0;
+    }
+    .pro-ticker-track img {
+        height: 32px;
+        max-width: 150px;
+        margin: 0 8vw;
+    }
+    .pro-ticker-track img.focused {
+        transform: scale(1.2);
+    }
+    .pro-ticker-progress-container {
+        margin-top: 20px;
+    }
+    .pro-ticker-progress-bar {
+        width: 150px;
+    }
+}
+
+
 /* FABs */
 .mobile-contact-bar { display: none; margin-top: 2.5rem; gap: 15px; pointer-events: auto; }
 .fab-stack-desktop { position: fixed; bottom: 35px; right: 35px; display: flex; flex-direction: column; gap: 12px; z-index: 1000; }
@@ -279,75 +541,8 @@ p { color: #ccc; line-height: 1.8; font-size: 1.05rem; position: relative; z-ind
 .fab-call svg { fill: #3b82f6; width: 26px; height: 26px; }
 .fab-email svg { fill: #ef4444; width: 26px; height: 26px; }
 .fab-whatsapp svg { fill: #25D366; width: 30px; height: 30px; }
-/* --- Premium Cookie Banner --- */
-.cookie-banner {
-    position: fixed;
-    bottom: 30px;
-    left: 40px;
-    max-width: 450px;
-    background: rgba(15, 15, 21, 0.6);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    z-index: 10000;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
-    transform: translateY(150%);
-    opacity: 0;
-    transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s ease;
-    pointer-events: none;
-}
+\n
 
-.cookie-banner.show {
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.cookie-text {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    color: #a0a0a0;
-    line-height: 1.6;
-}
-
-.cookie-text a {
-    color: #fff;
-    text-decoration: underline;
-    text-decoration-color: rgba(222, 33, 54, 0.6);
-    text-underline-offset: 4px;
-    transition: color 0.3s ease;
-}
-
-.cookie-text a:hover {
-    color: #ff283c;
-}
-
-.cookie-btn {
-    background: #fff;
-    color: #000;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    align-self: flex-start;
-    transition: background 0.3s ease, transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
-}
-
-@media (min-width: 1025px) {
-    .cookie-btn { cursor: none !important; }
-}
-
-.cookie-btn:hover {
-    background: #e0e0e0;
-    transform: translateY(-2px);
-}
 
 /* Media Queries */
 @media (min-width: 551px) and (max-width: 1024px) {
@@ -384,4 +579,6 @@ p { color: #ccc; line-height: 1.8; font-size: 1.05rem; position: relative; z-ind
     .hero-title { font-size: 3.5rem; }
     .hero-subtitle { font-size: 0.6rem; margin-top: 0.5rem; }
     .hero-subtitle .word-gap { width: 1rem; }
+
+    #footer-main { flex-direction: column !important; justify-content: center !important; text-align: center !important; padding: 30px 20px !important; font-size: 0.8rem !important; line-height: 1.6 !important; }
 }

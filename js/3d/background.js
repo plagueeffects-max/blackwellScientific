@@ -35,7 +35,7 @@ export function initBackground() {
     fgCanvasContainer.style.left = '0';
     fgCanvasContainer.style.width = '100%';
     fgCanvasContainer.style.height = '100%';
-    fgCanvasContainer.style.zIndex = '9999';
+    fgCanvasContainer.style.zIndex = '1';
     fgCanvasContainer.style.pointerEvents = 'none';
     document.body.appendChild(fgCanvasContainer);
 

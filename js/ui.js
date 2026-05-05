@@ -10,7 +10,54 @@ function drawWormShell(ctx) { ctx.fillStyle = '#e6ddc5'; for(let i = 0; i < 6; i
 function drawWormCore(ctx) { ctx.fillStyle = '#c4b89d'; ctx.beginPath(); ctx.arc(-25, 2, 2, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(5, -2, 3, 0, Math.PI * 2); ctx.fill(); }
 function drawTealCellShell(ctx) { ctx.fillStyle = 'rgba(42, 157, 143, 0.4)'; ctx.strokeStyle = 'rgba(72, 202, 228, 0.8)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, 0, 24, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); }
 function drawTealCellCore(ctx) { ctx.fillStyle = '#ff5400'; ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#ffbd00'; ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill(); }
-function drawTealDividingCell(ctx, progress) { let maxDist = 65; let dist = progress * maxDist; let outerR = 24; ctx.fillStyle = 'rgba(42, 157, 143, 0.4)'; ctx.strokeStyle = 'rgba(72, 202, 228, 0.8)'; ctx.lineWidth = 3; ctx.beginPath(); if (progress < 0.98) { let neckWidth = outerR * 2 * (1 - Math.pow(progress, 3.0)); if (neckWidth < 0) neckWidth = 0; let pinchY = neckWidth / 2; ctx.arc(dist/2, 0, outerR, -Math.PI/2, Math.PI/2); ctx.bezierCurveTo(dist/4, pinchY, -dist/4, pinchY, -dist/2, outerR); ctx.arc(-dist/2, 0, outerR, Math.PI/2, -Math.PI/2); ctx.bezierCurveTo(-dist/4, -pinchY, dist/4, -pinchY, dist/2, -outerR); } else { ctx.arc(-dist/2, 0, outerR, 0, Math.PI*2); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(dist/2, 0, outerR, 0, Math.PI*2); } ctx.closePath(); ctx.fill(); ctx.stroke(); let coreR = 10; let coreDist = dist * 0.7; ctx.fillStyle = '#ff5400'; ctx.beginPath(); if (progress < 0.94) { let coreProg = progress / 0.94; let coreNeck = coreR * 2 * (1 - Math.pow(coreProg, 3.0)); if (coreNeck < 0) coreNeck = 0; let cPinchY = coreNeck / 2; ctx.arc(coreDist/2, 0, coreR, -Math.PI/2, Math.PI/2); ctx.bezierCurveTo(coreDist/4, cPinchY, -coreDist/4, cPinchY, -coreDist/2, coreR); ctx.arc(-coreDist/2, 0, coreR, Math.PI/2, -Math.PI/2); ctx.bezierCurveTo(-coreDist/4, -cPinchY, coreDist/4, -cPinchY, coreDist/2, -coreR); } else { ctx.arc(-coreDist/2, 0, coreR, 0, Math.PI*2); ctx.closePath(); ctx.fill(); ctx.beginPath(); ctx.arc(coreDist/2, 0, coreR, 0, Math.PI*2); } ctx.closePath(); ctx.fill(); ctx.fillStyle = '#ffbd00'; ctx.beginPath(); ctx.arc(-coreDist/2, 0, 5, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(coreDist/2, 0, 5, 0, Math.PI*2); ctx.fill(); }
+function drawTealDividingCell(ctx, rawProgress) {
+    let progress = rawProgress * rawProgress * (3 - 2 * rawProgress);
+    let maxDist = 65;
+    let dist = progress * maxDist;
+    function drawOrganicSplit(fillColor, strokeColor, R, splitDist, snapThreshold) {
+        ctx.fillStyle = fillColor;
+        if(strokeColor) { ctx.strokeStyle = strokeColor; ctx.lineWidth = 3; }
+        ctx.beginPath();
+        let halfD = splitDist / 2;
+        if (progress >= snapThreshold || halfD >= R * 1.5) {
+            ctx.arc(-halfD, 0, R, 0, Math.PI*2); ctx.closePath(); ctx.fill(); if(strokeColor) ctx.stroke();
+            ctx.beginPath(); ctx.arc(halfD, 0, R, 0, Math.PI*2); ctx.closePath(); ctx.fill(); if(strokeColor) ctx.stroke();
+            return;
+        }
+        let stretchRatio = 1 + (progress / snapThreshold) * 0.8;
+        let stretchR = R * stretchRatio;
+        let cosTheta = halfD / stretchR;
+        if (cosTheta > 0.999) cosTheta = 0.999;
+        let pinchAngle = Math.acos(cosTheta);
+        if (pinchAngle < 0.15 && progress < snapThreshold) pinchAngle = 0.15;
+        let angleA = Math.PI - pinchAngle;
+        let angleB = pinchAngle;
+        let x1 = halfD + R * Math.cos(angleA); let y1 = R * Math.sin(angleA);
+        let x2 = -halfD + R * Math.cos(angleB); let y2 = R * Math.sin(angleB);
+        let k = Math.abs(x1 - x2) * 0.55; 
+        let cp1x = x1 - k * Math.sin(pinchAngle); let cp1y = y1 - k * Math.cos(pinchAngle);
+        let cp2x = x2 + k * Math.sin(pinchAngle); let cp2y = y2 - k * Math.cos(pinchAngle);
+        let x3 = x2; let y3 = -y2;
+        let x4 = x1; let y4 = -y1;
+        let cp3x = x3 + k * Math.sin(pinchAngle); let cp3y = y3 + k * Math.cos(pinchAngle);
+        let cp4x = x4 - k * Math.sin(pinchAngle); let cp4y = y4 + k * Math.cos(pinchAngle);
+        ctx.arc(halfD, 0, R, -angleA, angleA, false);
+        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x2, y2);
+        ctx.arc(-halfD, 0, R, angleB, -angleB, false);
+        ctx.bezierCurveTo(cp3x, cp3y, cp4x, cp4y, x4, y4);
+        ctx.closePath(); ctx.fill(); if(strokeColor) ctx.stroke();
+    }
+    drawOrganicSplit('rgba(42, 157, 143, 0.4)', 'rgba(72, 202, 228, 0.8)', 24, dist, 0.98);
+    drawOrganicSplit('#ff5400', null, 10, dist * 0.7, 0.94);
+    ctx.fillStyle = '#ffbd00'; ctx.beginPath();
+    let coreDist = dist * 0.7;
+    if (progress < 0.3) {
+        ctx.arc(0, 0, 5, 0, Math.PI*2); ctx.fill();
+    } else {
+        ctx.arc(-coreDist/2, 0, 5, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(coreDist/2, 0, 5, 0, Math.PI*2); ctx.fill();
+    }
+}
 
 const mTypes = ['virus', 'bacillus', 'worm', 'teal_cell', 'dividing_cell'];
 
@@ -115,7 +162,7 @@ document.querySelectorAll('.step-card').forEach((card, index) => {
         microbes = [];
         let count = isMobile ? 12 : 25;
         if (index === 0) {
-            const allowedTypes = ['teal_cell', 'dividing_cell', 'worm'];
+            const allowedTypes = mTypes;
             for (let i = 0; i < count; i++) microbes.push(new TileMicrobe(allowedTypes[Math.floor(Math.random() * allowedTypes.length)], mWidth, mHeight)); 
         } else if (index === 1) {
             const allowedTypes = ['virus', 'bacillus'];
@@ -131,7 +178,7 @@ document.querySelectorAll('.step-card').forEach((card, index) => {
             for (let i = microbes.length - 1; i >= 0; i--) {
                 if (microbes[i].dead) {
                     microbes.splice(i, 1);
-                    const allowedTypes = index === 0 ? ['teal_cell', 'dividing_cell', 'worm'] : ['virus', 'bacillus'];
+                    const allowedTypes = index === 0 ? mTypes : ['virus', 'bacillus'];
                     microbes.push(new TileMicrobe(allowedTypes[Math.floor(Math.random() * allowedTypes.length)], mWidth, mHeight));
                 }
             }
@@ -267,8 +314,29 @@ document.querySelectorAll('.step-card').forEach(card => {
         if (!isRevealed || currentProgress < 1.0) return; // Wait for intro to finish before mouse takes over
         cancelAnimationFrame(glowAnimFrame);
         const rect = card.getBoundingClientRect();
-        card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-        card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+        
+        // Track glow
+        const mouseXpx = e.clientX - rect.left;
+        const mouseYpx = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${mouseXpx}px`);
+        card.style.setProperty('--mouse-y', `${mouseYpx}px`);
+
+        // Comet Card 3D Tilt
+        if (!isMobile) {
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((mouseYpx - centerY) / centerY) * -6;
+            const rotateY = ((mouseXpx - centerX) / centerX) * 6;
+            
+            card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            card.style.transition = 'transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            
+            const canvas = card.querySelector('.tile-canvas');
+            if (canvas) {
+                canvas.style.transform = `translateX(${rotateY * -1.5}px) translateY(${rotateX * 1.5}px)`;
+                canvas.style.transition = 'transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            }
+        }
     });
 
     card.addEventListener('mouseleave', () => {
@@ -277,24 +345,18 @@ document.querySelectorAll('.step-card').forEach(card => {
         // Snap gracefully back to the bottom cluster when mouse leaves
         card.style.setProperty('--mouse-x', '50%');
         card.style.setProperty('--mouse-y', '100%');
+
+        if (!isMobile) {
+            // Reset 3D Tilt
+            card.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1)`;
+            card.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            
+            const canvas = card.querySelector('.tile-canvas');
+            if (canvas) {
+                canvas.style.transform = `translateX(0px) translateY(0px)`;
+                canvas.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            }
+        }
     });
 });
-
-// --- Premium Cookie Banner Logic ---
-document.addEventListener("DOMContentLoaded", () => {
-    const cookieBanner = document.getElementById('cookie-banner');
-    const acceptBtn = document.getElementById('btn-accept-cookies');
-    
-    if (cookieBanner && acceptBtn) {
-        if (!localStorage.getItem('cookiesAccepted')) {
-            setTimeout(() => {
-                cookieBanner.classList.add('show');
-            }, 1800); // 1.8s delay lets the initial animations finish before dropping this in
-        }
-        
-        acceptBtn.addEventListener('click', () => {
-            localStorage.setItem('cookiesAccepted', 'true');
-            cookieBanner.classList.remove('show');
-        });
-    }
-});
+
