@@ -1,3 +1,22 @@
+// Initialize Lenis for buttery smooth scrolling
+const lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // standard easing
+    direction: 'vertical',
+    gestureDirection: 'vertical',
+    smooth: true,
+    mouseMultiplier: 1,
+    smoothTouch: false,
+    touchMultiplier: 2,
+    infinite: false,
+});
+
+function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+}
+requestAnimationFrame(raf);
+
 let isMobile = window.innerWidth <= 550;
 let isTablet = window.innerWidth > 550 && window.innerWidth <= 1024;
 
@@ -200,20 +219,31 @@ function updateTimeline() {
     if (!timelineContainer) return;
     const progress = document.querySelector('.timeline-progress');
     const items = document.querySelectorAll('.timeline-item');
-    if (window.innerWidth <= 1024) { progress.style.height = '100%'; items.forEach(item => item.classList.add('active')); return; }
-
     const rect = timelineContainer.getBoundingClientRect();
     const windowHeight = window.innerHeight;
     const triggerPoint = windowHeight * 0.9;
-    let pixelProgress = triggerPoint - rect.top;
-    let scrollPercentage = Math.max(0, Math.min(1, pixelProgress / rect.height));
+    
+    const lastItem = items[items.length - 1];
+    const maxLineHeight = lastItem.offsetTop + 14; // Adjust to reach bottom of the last dot
+    
+    // Explicitly restrict the faint track from going further down
+    const track = document.querySelector('.timeline-track');
+    if (track) track.style.height = maxLineHeight + 'px';
 
-    progress.style.height = (scrollPercentage * 100) + '%';
-    const currentLineBottom = scrollPercentage * rect.height;
+    if (window.innerWidth <= 1024) { 
+        progress.style.height = maxLineHeight + 'px'; 
+        items.forEach(item => item.classList.add('active')); 
+        return; 
+    }
+
+    let pixelProgress = triggerPoint - rect.top;
+    pixelProgress = Math.max(0, Math.min(maxLineHeight, pixelProgress));
+
+    progress.style.height = pixelProgress + 'px';
 
     items.forEach((item) => {
         const dotPosition = item.offsetTop + 2; 
-        if (currentLineBottom >= dotPosition) item.classList.add('active');
+        if (pixelProgress >= dotPosition) item.classList.add('active');
         else item.classList.remove('active');
     });
 }

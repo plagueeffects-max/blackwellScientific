@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", async () => {
     // Ultimate Fallback array in case live-server blocks directory browsing
     let rawLogos = [
-        "logos/Bruker.png",
-        "logos/FELIX.png",
-        "logos/PHCbi.png",
-        "logos/azure%20biosystems.png",
-        "logos/sigma.png"
+        "logos/Bruker.webp",
+        "logos/FELIX.webp",
+        "logos/PHCbi.webp",
+        "logos/azure%20biosystems.webp",
+        "logos/sigma.webp"
     ];
 
     // --- Dynamic Auto-Discovery Engine ---
